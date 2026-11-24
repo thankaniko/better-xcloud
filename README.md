@@ -44,7 +44,7 @@ Execute `python3 build.py` no diretório do código-fonte (Python 3 e `ar`). Val
 - IPK: `org.webos.community.bxfinal_1.0.0_all.ipk` — SHA-256 `414a24412dba77639932691c3b6f616657b912bccd612cc4b9f73c46002aac36`.
 - Código-fonte: `bx-community-final-source.zip` — SHA-256 `3aa1412ab473e4dc6e6308f7e57ec86ecd3963515797003e2699024777a0c2ab`.
 - Empacotamento, sintaxe Node.js e testes simulados de escopo, codec e fallback aprovados. Instalação e streaming reais da versão final não homologados.
-- Os binários e o ZIP foram entregues separadamente; não estão anexados a uma release do GitHub neste momento.
+- Arquivos finais preservados no diretório [`final/`](final/): [IPK](final/org.webos.community.bxfinal_1.0.0_all.ipk) e [código-fonte, build e testes](final/bx-community-final-source.zip). Não é uma release estável nem um pacote do catálogo principal.
 
 ---
 
