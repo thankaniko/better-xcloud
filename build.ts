@@ -159,12 +159,12 @@ async function buildPatches() {
     const files = await readdir(inputDir);
     const tsFiles = files.filter(file => file.endsWith('.ts'));
 
-    tsFiles.forEach(async file => {
+    for (const file of tsFiles) {
         // You can perform any operation with each TypeScript file
         console.log(`Building patch: ${file}`);
         const filePath = `${inputDir}/${file}`;
 
-        await Bun.build({
+        const patchBuild = await Bun.build({
             entrypoints: [filePath],
             outdir: outputDir,
             target: 'browser',
@@ -175,6 +175,9 @@ async function buildPatches() {
             },
         });
 
+        if (!patchBuild.success) {
+            throw new Error(`Patch build failed: ${file}`);
+        }
         const outputFile = `${outputDir}/${file.replace('.ts', '.js')}`;
 
         let code = await readFile(outputFile, 'utf-8');
@@ -189,7 +192,7 @@ async function buildPatches() {
         // Save
         await Bun.write(outputFile, code);
         console.log(`Patch built successfully: ${file}`)
-      });
+    }
 }
 
 async function build(target: BuildTarget, params: { version: string, variant: BuildVariant, pretty: boolean, meta: boolean }, config: any={}) {
@@ -269,7 +272,7 @@ async function build(target: BuildTarget, params: { version: string, variant: Bu
     console.log(`---- [${target}] ${new Date()}`);
 }
 
-const buildTargets = [
+const defaultBuildTargets = [
     BuildTarget.ALL,
     // BuildTarget.ANDROID_APP,
     // BuildTarget.MOBILE,
@@ -283,6 +286,9 @@ const { values, positionals } = parseArgs({
             type: 'string',
         },
 
+        target: {
+            type: 'string',
+        },
         variant: {
             type: 'string',
             default: 'full',
@@ -304,6 +310,7 @@ const { values, positionals } = parseArgs({
     values: {
         version: string,
         variant: BuildVariant,
+        target?: string,
         pretty: boolean,
         meta: boolean,
     },
@@ -319,6 +326,12 @@ if (values['variant'] !== 'full' && values['variant'] !== 'lite') {
     console.log('--variant param must be either "full" or "lite"');
     sys.exit(-1);
 }
+
+const requestedTarget = values.target;
+if (requestedTarget && !Object.values(BuildTarget).includes(requestedTarget as BuildTarget)) {
+    throw new Error(`Invalid build target: ${requestedTarget}`);
+}
+const buildTargets = requestedTarget ? [requestedTarget as BuildTarget] : defaultBuildTargets;
 
 async function main() {
     const config = {};
